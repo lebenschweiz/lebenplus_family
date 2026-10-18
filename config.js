@@ -1,15 +1,12 @@
 // Firebase-Konfiguration für Google-Login und gemeinsame Daten.
-// Solange hier null steht, speichert Lebenplus nur auf dem jeweiligen Gerät.
-// Die Werte aus der Firebase-Konsole (Projekteinstellungen → Meine Apps → Web-App) hier eintragen:
-window.LEBENPLUS_FIREBASE = null;
-/*
+// Diese Werte sind nicht geheim; geschützt werden die Daten durch die Firestore-Regeln.
+// Steht hier null, speichert Lebenplus nur auf dem jeweiligen Gerät.
 window.LEBENPLUS_FIREBASE = {
-  apiKey: "…",
-  authDomain: "….firebaseapp.com",
-  projectId: "…",
-  storageBucket: "….appspot.com",
-  messagingSenderId: "…",
-  appId: "…",
+  apiKey: "AIzaSyDQMNkF6iKH3hyjqt4ESaUx5InlYAYO3OE",
+  authDomain: "lebenplus-family.firebaseapp.com",
+  projectId: "lebenplus-family",
+  storageBucket: "lebenplus-family.firebasestorage.app",
+  messagingSenderId: "268335327522",
+  appId: "1:268335327522:web:45ab1bc2dee3b8c08cdd7b",
   familyId: "familie"
 };
-*/
