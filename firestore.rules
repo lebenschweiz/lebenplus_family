@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Nur freigeschaltete Google-Konten der Familie dürfen lesen und schreiben.
+    // Die E-Mail-Adressen in Kleinbuchstaben eintragen.
+    match /families/{family}/{document=**} {
+      allow read, write: if request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() in [
+          'erste.adresse@gmail.com',
+          'zweite.adresse@gmail.com'
+        ];
+    }
+  }
+}
