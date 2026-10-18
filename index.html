@@ -120,6 +120,8 @@ main .wrap { padding-block: 20px 64px; display: flex; flex-direction: column; ga
 .task.on .badge { background: var(--c); color: #fff; }
 .empty { padding: 22px 16px 26px; color: var(--ink-2); text-align: center; }
 .empty .btn { margin-top: 10px; }
+.dayfoot { display: flex; justify-content: space-between; gap: 10px; border-top: 1px dashed var(--line); padding: 10px 16px 12px; font-size: .85rem; color: var(--ink-2); }
+.dayfoot b { color: var(--ink); }
 .goalbar { height: 4px; background: var(--line); }
 .goalbar i { display: block; height: 100%; background: var(--c); transition: width .5s cubic-bezier(.2,.8,.2,1); }
 
@@ -305,6 +307,15 @@ const members = () => [...S.members.entries()].map(([id, m]) => ({ id, ...m })).
 const tasksOf = (mid) => [...S.tasks.entries()].map(([id, t]) => ({ id, ...t })).filter((t) => t.memberId === mid && !t.archived)
   .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 const dayKey = (mid, date) => `${mid}_${date}`;
+// Höchstmögliche Punkte pro Tag; bei Entweder-oder-Vorsätzen zählt nur der höchste.
+function maxPoints(mid) {
+  let n = 0; const groups = {};
+  for (const t of tasksOf(mid)) {
+    const p = Number(t.points) || 0;
+    if (t.group) groups[t.group] = Math.max(groups[t.group] || 0, p); else n += p;
+  }
+  return n + Object.values(groups).reduce((a, b) => a + b, 0);
+}
 const doneOf = (mid, date) => S.days.get(dayKey(mid, date))?.done || {};
 const sum = (o) => Object.values(o).reduce((a, v) => a + (Number(v) || 0), 0);
 const total = (mid, date) => sum(doneOf(mid, date));
@@ -515,6 +526,7 @@ function viewTag() {
         return `<li><button class="task ${on ? "on" : ""} ${UI.flash === t.id + "@" + UI.date ? "flash" : ""}" data-act="toggle" data-mid="${m.id}" data-tid="${t.id}" data-date="${UI.date}" aria-pressed="${on}" ${S.readOnly || future ? "disabled" : ""}>
           <span class="chk">${ICON_CHECK}</span><span class="t">${esc(t.title)}${hint}</span><span class="badge num">+${Number(t.points) || 0}</span></button></li>`;
       }).join("")}</ul>` : `<div class="empty small">Noch keine Vorsätze.${S.readOnly ? "" : ` <br><button class="btn ghost" data-act="tab" data-tab="setup">Vorsatz anlegen</button>`}</div>`}
+      ${ts.length ? `<div class="dayfoot num"><span>Möglich pro Tag</span><span><b>${val}</b> von <b>${maxPoints(m.id)}</b> Punkten</span></div>` : ""}
     </article>`;
   }).join("");
   return `${pills(ms, "daypills", true)}${future ? `<div class="banner">Dieser Tag liegt in der Zukunft. Abhaken geht erst, wenn er da ist.</div>` : ""}<div class="daygrid">${cards}</div>`;
@@ -622,7 +634,8 @@ function viewSetup() {
   if (m) {
     const ts = tasksOf(m.id);
     tasksPanel = `<section class="panel" style="--c:${esc(m.color)}">
-      <div class="panelhead"><div><h2>Vorsätze von ${esc(m.name)}</h2><div class="muted small">Titel antippen zum Ändern. Mit + und − legt ihr die Punkte fest.</div></div></div>
+      <div class="panelhead"><div><h2>Vorsätze von ${esc(m.name)}</h2><div class="muted small">Titel antippen zum Ändern. Mit + und − legt ihr die Punkte fest.</div></div>
+        <div class="muted small num">Möglich pro Tag: <b style="color:var(--ink)">${maxPoints(m.id)} Punkte</b></div></div>
       ${pills(ms, "", false)}
       <ul class="editlist" style="margin-top:14px">${ts.map((t, i) => `<li class="editrow">
         <input class="title" id="t-${t.id}" value="${esc(t.title)}" data-field="title" data-tid="${t.id}" aria-label="Titel" ${ro}>
