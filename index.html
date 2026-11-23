@@ -425,7 +425,7 @@ async function firebaseStore(cfg) {
     S.mode = "cloud"; S.ready = false; render();
     const loaded = new Set(), fresh = new Set();
     let seeded = false;
-    const sub = (name, q) => unsubs.push(F.onSnapshot(q, (snap) => {
+    const sub = (name, q) => unsubs.push(F.onSnapshot(q, { includeMetadataChanges: true }, (snap) => {
       S[name] = new Map(snap.docs.map((d) => [d.id, d.data()]));
       loaded.add(name);
       if (!snap.metadata.fromCache) fresh.add(name);
